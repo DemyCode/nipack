@@ -40,7 +40,6 @@
           cargo = toolchain;
           rustc = toolchain;
         };
-
       in
       {
         # For `nix build` & `nix run`:
