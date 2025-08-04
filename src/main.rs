@@ -1,6 +1,6 @@
 use std::{env, fs};
 
-use rnix::ast::HasEntry;
+use rnix::ast::{AttrSet, AttrpathValue, Entry, Expr, HasEntry};
 
 fn main() {
     let mut iter = env::args().skip(1).peekable();
@@ -12,26 +12,20 @@ fn main() {
         let content = match fs::read_to_string(file) {
             Ok(content) => content,
             Err(err) => {
-                println!("error reading file: {}", err);
+                println!("error reading file: {err}");
                 return;
             }
         };
         let ast = rnix::Root::parse(&content).ok().unwrap();
         let expr = ast.expr().unwrap();
-        let new_expr = match expr {
+        let new_expr: Option<Expr> = match expr {
             rnix::ast::Expr::AttrSet(attr_set) => {
-                for attr in attr_set.entries() {
-                    match attr {
-                        rnix::ast::Entry::Inherit(inherit) => todo!(),
-                        rnix::ast::Entry::AttrpathValue(attrpath_value) => todo!(),
-                    }
-                }
+                let copy = attr_set.entries();
+                Some(rnix::ast::Expr::AttrSet(attr_set))
             }
-
-            _ => {
-                eprintln!("Expected an attribute set, found: {:?}", expr);
-                return;
-            }
+            _ => None,
         };
+
+        println!("Parsed successfully: {:?}", new_expr);
     }
 }
